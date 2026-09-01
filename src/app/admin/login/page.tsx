@@ -1,5 +1,6 @@
-export const dynamic = 'force-dynamic'
 'use client'
+
+export const dynamic = 'force-dynamic'
 
 import { useState } from 'react'
 import { Montserrat } from 'next/font/google'
@@ -11,7 +12,7 @@ import Link from 'next/link'
 
 const montserrat = Montserrat({
   subsets: ['latin', 'cyrillic'],
-  weight: ['400', '500', '600', '700'],
+  weight: ['400', '500', '600', '700', '800'],
   variable: '--font-montserrat',
 })
 
@@ -20,98 +21,100 @@ export default function AdminLoginPage() {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
-  const handleAdminLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    setError(null)
+    setError('')
 
-    const { error: authError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+    try {
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
-    if (authError) {
-      setError('Невірний email або пароль адміністратора.')
-      setLoading(false)
-    } else {
+      if (authError) throw authError
+
       router.push('/admin')
       router.refresh()
+    } catch (err: any) {
+      console.error('Login error:', err)
+      setError('Невірний email або пароль доступу.')
+    } finally {
+      setLoading(false)
     }
   }
 
   return (
-    <div className={`${montserrat.variable} font-[family-name:var(--font-montserrat)] text-[#353535] bg-[#FFFFFF] relative overflow-hidden min-h-screen flex items-center justify-center px-6`}>
+    <div className={`${montserrat.variable} font-[family-name:var(--font-montserrat)] text-[#353535] bg-[#EAF4FB] min-h-screen flex items-center justify-center p-6 relative overflow-hidden`}>
       <InteractiveBackground />
-
-      <div className="w-full max-w-md p-8 md:p-12 rounded-[3rem] bg-white border border-[#BDE5FF] shadow-[0_20px_50px_rgba(83,166,216,0.1)] relative z-10 space-y-8">
+      
+      <div className="w-full max-w-md p-10 rounded-[3rem] bg-white border border-[#BDE5FF]/60 shadow-[0_20px_60px_rgba(83,166,216,0.15)] relative z-10 space-y-8 animate-fadeIn">
+        
         <div className="text-center space-y-3">
-          <div className="w-14 h-14 bg-[#BDE5FF]/30 text-[#53A6D8] rounded-2xl flex items-center justify-center mx-auto shadow-sm">
-            <ShieldCheck className="w-7 h-7" />
+          <div className="w-16 h-16 rounded-2xl bg-[#BDE5FF]/30 text-[#53A6D8] border border-[#BDE5FF] flex items-center justify-center mx-auto shadow-sm">
+            <ShieldCheck className="w-8 h-8" />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">Панель координатора</h1>
-          <p className="text-xs text-[#353535]/70 max-w-xs mx-auto">
-            Введіть дані адміністратора PLEKAYOU.
-          </p>
+          <h1 className="text-2xl font-extrabold tracking-tight">Панель Адміністратора</h1>
+          <p className="text-xs text-[#353535]/70">Введіть адміністративні дані для керування платформою PLEKAYOU</p>
         </div>
 
         {error && (
-          <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-xs font-medium text-red-600 text-center">
+          <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-xs text-red-600 font-medium text-center">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleAdminLogin} className="space-y-5">
+        <form onSubmit={handleLogin} className="space-y-5">
           <div className="space-y-1.5">
-            <label className="text-[10px] font-bold uppercase tracking-wider text-[#353535]/70">Email координатора</label>
+            <label className="text-xs font-bold uppercase tracking-wider text-[#353535]/70">Email</label>
             <div className="relative">
-              <Mail className="w-4 h-4 text-[#53A6D8] absolute left-4 top-1/2 -translate-y-1/2" />
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#53A6D8]" />
               <input 
                 type="email" 
                 required
+                placeholder="admin@plekayou.org"
                 value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="plekai.youth@gmail.com"
-                className="w-full pl-11 pr-5 py-4 rounded-2xl bg-[#F8FBFF] border border-[#BDE5FF] text-xs font-medium focus:outline-none focus:border-[#53A6D8]"
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full pl-12 pr-5 py-3.5 rounded-2xl bg-[#F8FBFF] border border-[#BDE5FF]/60 text-sm focus:outline-none focus:border-[#53A6D8] transition-all"
               />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[10px] font-bold uppercase tracking-wider text-[#353535]/70">Пароль</label>
+            <label className="text-xs font-bold uppercase tracking-wider text-[#353535]/70">Пароль</label>
             <div className="relative">
-              <Lock className="w-4 h-4 text-[#53A6D8] absolute left-4 top-1/2 -translate-y-1/2" />
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#53A6D8]" />
               <input 
                 type="password" 
                 required
-                value={password}
-                onChange={e => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full pl-11 pr-5 py-4 rounded-2xl bg-[#F8FBFF] border border-[#BDE5FF] text-xs font-medium focus:outline-none focus:border-[#53A6D8]"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full pl-12 pr-5 py-3.5 rounded-2xl bg-[#F8FBFF] border border-[#BDE5FF]/60 text-sm focus:outline-none focus:border-[#53A6D8] transition-all"
               />
             </div>
           </div>
 
           <button 
-            type="submit" 
+            type="submit"
             disabled={loading}
-            className="w-full py-4 rounded-2xl text-xs font-bold text-white bg-[#53A6D8] hover:bg-[#3f8dbe] transition-all shadow-[0_10px_25px_rgba(83,166,216,0.3)] flex items-center justify-center gap-2"
+            className="w-full py-4 rounded-2xl bg-[#53A6D8] text-white font-bold text-sm hover:bg-[#3f8dbe] transition-all shadow-[0_10px_25px_rgba(83,166,216,0.3)] flex items-center justify-center gap-2 disabled:opacity-50"
           >
-            {loading ? 'Вхід в систему...' : 'Увійти в адмін-панель'} <ArrowRight className="w-4 h-4" />
+            {loading ? 'Вхід...' : <>Увійти в систему <ArrowRight className="w-4 h-4" /></>}
           </button>
         </form>
 
-        <div className="text-center pt-2 flex items-center justify-between text-xs font-bold">
-          <Link href="/" className="text-[#353535]/60 hover:text-[#53A6D8] transition-colors">
-            &larr; На головну
-          </Link>
-          <Link href="/teacher/login" className="text-[#53A6D8] hover:underline">
-            Вхід для викладачів &rarr;
+        <div className="text-center pt-2">
+          <Link href="/" className="text-xs font-bold text-[#53A6D8] hover:underline">
+            &larr; Повернутися на головну
           </Link>
         </div>
+
       </div>
+
     </div>
   )
 }
