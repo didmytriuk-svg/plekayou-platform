@@ -1,44 +1,24 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@layer base {
-  :root {
-    --bg-main: #ffffff;
-    --card-bg: #ffffff;
-    --sky-accent: #53A6D8;
-    --text-main: #353535;
-    --text-muted: #595F7E;
-  }
-
-  body {
-    background-color: var(--bg-main);
-    color: var(--text-main);
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    overflow-x: hidden;
-  }
+:root {
+  --background: #ffffff;
+  --foreground: #353535;
 }
 
-/* Преміальний світлий градієнтний фон з м'якою сіткою у стилі editorial */
-.sky-interactive-bg {
-  position: relative;
-  background: linear-gradient(135deg, #f3f8ff 0%, #ffffff 50%, #ebf5ff 100%);
-  background-attachment: fixed;
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-montserrat), sans-serif;
   overflow-x: hidden;
 }
 
-.sky-interactive-bg::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(rgba(83, 166, 216, 0.08) 1px, transparent 1px);
-  background-size: 36px 36px;
-  z-index: 0;
-  pointer-events: none;
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
 }
 
-.sky-card {
-  background-color: #ffffff;
-  border: 1px solid #BDE5FF;
-  box-shadow: 0 10px 30px -10px rgba(83, 166, 216, 0.15);
-  position: relative;
-  z-index: 1;
+.animate-fadeIn {
+  animation: fadeIn 0.25s ease-out forwards;
 }
